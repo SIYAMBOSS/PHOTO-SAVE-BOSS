@@ -1,0 +1,53 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
+
+body {
+    background-color: #000;
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+}
+
+.glass-card {
+    background: rgba(20, 20, 20, 0.9);
+    border: 1px solid #333;
+}
+
+.auth-input {
+    width: 100%;
+    padding: 1rem;
+    background: #111;
+    border: 1px solid #222;
+    border-radius: 12px;
+    color: white;
+    outline: none;
+}
+
+.upload-btn {
+    background: #0056b3;
+}
+
+/* Gallery Style Grid */
+#gallery img {
+    aspect-ratio: 1 / 1;
+    width: 100%;
+    object-cover: cover;
+    display: block;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+#gallery img:active {
+    opacity: 0.7;
+}
+
+.loader {
+    width: 30px;
+    height: 30px;
+    border: 3px solid #333;
+    border-bottom-color: #0056b3;
+    border-radius: 50%;
+    display: inline-block;
+    animation: rotation 1s linear infinite;
+}
+
+@keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
