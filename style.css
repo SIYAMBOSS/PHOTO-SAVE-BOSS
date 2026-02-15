@@ -1,53 +1,21 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
+.hero-container { perspective: 1000px; }
+.floating-img {
+    width: 70px; height: 110px; object-fit: cover; border-radius: 10px;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    animation: live-float 5s ease-in-out infinite;
+}
+.img-1 { --rot: -8deg; animation-delay: 0s; transform: rotate(-8deg); }
+.img-2 { --rot: 5deg; animation-delay: 1s; transform: rotate(5deg); }
+.img-3 { --rot: -4deg; animation-delay: 2s; transform: rotate(-4deg); }
+.img-4 { --rot: 10deg; animation-delay: 3s; transform: rotate(10deg); }
 
-body {
-    background-color: #000;
-    color: #fff;
-    font-family: 'Inter', sans-serif;
-    margin: 0;
+@keyframes live-float {
+    0%, 100% { transform: translateY(0) rotate(var(--rot)); }
+    50% { transform: translateY(-15px) rotate(calc(var(--rot) + 3deg)); }
 }
 
-.glass-card {
-    background: rgba(20, 20, 20, 0.9);
-    border: 1px solid #333;
-}
-
-.auth-input {
-    width: 100%;
-    padding: 1rem;
-    background: #111;
-    border: 1px solid #222;
-    border-radius: 12px;
-    color: white;
-    outline: none;
-}
-
-.upload-btn {
-    background: #0056b3;
-}
-
-/* Gallery Style Grid */
-#gallery img {
-    aspect-ratio: 1 / 1;
-    width: 100%;
-    object-cover: cover;
-    display: block;
-    cursor: pointer;
-    transition: opacity 0.2s;
-}
-
-#gallery img:active {
-    opacity: 0.7;
-}
-
-.loader {
-    width: 30px;
-    height: 30px;
-    border: 3px solid #333;
-    border-bottom-color: #0056b3;
-    border-radius: 50%;
-    display: inline-block;
-    animation: rotation 1s linear infinite;
-}
-
-@keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+.glass-card { background: rgba(10, 10, 15, 0.95); border: 1px solid #222; }
+.auth-input { width: 100%; padding: 1rem; background: #000; border: 1px solid #222; border-radius: 12px; color: #fff; outline: none; }
+.auth-input:focus { border-color: #3b82f6; }
+.upload-btn { background: linear-gradient(90deg, #1e3a8a, #000428); }
+#photos-content img { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
