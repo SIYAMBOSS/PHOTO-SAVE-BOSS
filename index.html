@@ -3,48 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIYAMBOSS | PREMIUM VAULT</title>
+    <title>SIYAMBOSS | HD VAULT</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
-<body>
+<body class="bg-black text-white">
+    <audio id="login-sound" src="https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3" preload="auto"></audio>
 
     <section id="auth-section" class="flex items-center justify-center min-h-screen p-4">
-        <div class="glass-card p-10 rounded-3xl w-full max-w-md text-center">
-            <h2 class="boss-font text-3xl font-black mb-2 text-blue-500">SIYAMBOSS</h2>
-            <p class="text-gray-500 text-xs mb-8 uppercase tracking-[0.3em]">Cloud Storage</p>
-            <div class="space-y-4">
-                <input type="email" id="user-email" placeholder="Gmail Address" class="auth-input">
-                <input type="password" id="pin-1" placeholder="Enter PIN" class="auth-input">
-                <div id="confirm-pin-box" class="hidden">
-                    <input type="password" id="pin-2" placeholder="Confirm PIN" class="auth-input mt-4">
-                </div>
-                <button onclick="handleAuth()" class="w-full upload-btn p-4 rounded-xl font-bold uppercase mt-4">Enter Vault</button>
+        <div class="glass-card p-8 rounded-3xl w-full max-w-md text-center border-glow">
+            <div class="hero-container flex justify-center gap-3 mb-8">
+                <img src="https://i.ibb.co/XfqmXyH/1000045022.jpg" class="floating-img img-1">
+                <img src="https://i.ibb.co/0YmX4QZ/1000045011.jpg" class="floating-img img-2">
+                <img src="https://i.ibb.co/9vFzXqH/1000045005.jpg" class="floating-img img-3">
+                <img src="https://i.ibb.co/mS7Nq4g/1000044972.jpg" class="floating-img img-4">
             </div>
-            <p id="toggle-text" class="mt-8 text-sm text-gray-500 cursor-pointer" onclick="toggleAuth()">New User? <span class="text-blue-500">Register</span></p>
+
+            <h2 id="auth-title" class="text-2xl font-black mb-6 text-blue-500 tracking-widest uppercase">Login</h2>
+            
+            <div class="space-y-4">
+                <div id="reg-fields" class="hidden animate-fade-in">
+                    <input type="text" id="user-name" placeholder="Full Name" class="auth-input mb-4">
+                </div>
+                <input type="email" id="user-email" placeholder="Gmail Address" class="auth-input">
+                <input type="password" id="pin-1" placeholder="PIN" class="auth-input">
+                <button onclick="handleAuth()" class="w-full upload-btn p-4 rounded-xl font-bold uppercase mt-4">Continue</button>
+            </div>
+
+            <p id="toggle-text" class="mt-6 text-sm text-gray-500 cursor-pointer" onclick="toggleAuth()">
+                Don't have an account? <span class="text-blue-500 font-bold">Create Account</span>
+            </p>
         </div>
     </section>
 
     <main id="dashboard" class="hidden min-h-screen">
-        <header class="sticky top-0 z-50 bg-black/80 backdrop-blur-md p-4 border-b border-gray-900">
-            <div class="flex justify-between items-center max-w-6xl mx-auto">
-                <h1 class="text-xl font-bold">Photos <span id="photo-count" class="text-xs text-gray-500 block">0 photos</span></h1>
+        <header class="p-4 border-b border-zinc-900 sticky top-0 bg-black/80 backdrop-blur-md z-50">
+            <div class="flex justify-between items-center max-w-4xl mx-auto">
+                <h1 class="text-xl font-bold">SIYAMBOSS <span id="photo-count" class="text-xs text-zinc-500 block">Vault Active</span></h1>
                 <div class="flex gap-4">
-                    <label for="file-upload" class="cursor-pointer text-blue-500 text-xl"><i class="fa-solid fa-plus"></i></label>
+                    <label for="file-upload" class="cursor-pointer text-blue-500 text-xl"><i class="fa-solid fa-cloud-arrow-up"></i></label>
                     <button onclick="logout()" class="text-red-500"><i class="fa-solid fa-power-off"></i></button>
                 </div>
             </div>
-            <div class="flex justify-center gap-8 mt-4 text-sm font-semibold border-t border-gray-900 pt-3">
-                <span class="text-blue-500 border-b-2 border-blue-500 pb-2">Photos</span>
-                <span class="text-gray-500">Albums</span>
+            <div class="flex justify-center mt-4 border-t border-zinc-900 pt-2 gap-8">
+                <button onclick="switchTab('photos')" id="tab-photos" class="text-blue-500 font-bold border-b-2 border-blue-500 pb-1">Photos</button>
+                <button onclick="switchTab('albums')" id="tab-albums" class="text-zinc-500 pb-1">Albums</button>
             </div>
         </header>
 
-        <div class="p-1">
-            <input type="file" id="file-upload" class="hidden" accept="image/*" onchange="uploadImage(event)">
-            <div id="gallery" class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-0.5">
-                </div>
+        <input type="file" id="file-upload" class="hidden" accept="image/*" onchange="uploadImage(event)">
+        
+        <div id="photos-content" class="grid grid-cols-3 gap-0.5 max-w-4xl mx-auto py-2"></div>
+        <div id="albums-content" class="hidden max-w-4xl mx-auto p-4 text-center text-zinc-600">
+            <p><i class="fa-solid fa-folder-open text-4xl mb-2"></i><br>No Albums Created Yet</p>
         </div>
     </main>
 
