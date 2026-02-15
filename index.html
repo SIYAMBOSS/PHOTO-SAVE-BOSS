@@ -9,13 +9,13 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 </head>
-<body class="bg-[#050505] text-white">
+<body class="bg-[#050505] text-white font-sans selection:bg-blue-500/30">
 
     <audio id="login-sound" src="https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3" preload="auto"></audio>
 
     <section id="auth-section" class="flex items-center justify-center min-h-screen p-4 hidden">
-        <div class="glass-card p-8 rounded-[2rem] w-full max-w-sm text-center border border-zinc-800 shadow-2xl">
-            <div class="swiper mySwiper mb-8 rounded-2xl overflow-hidden">
+        <div class="glass-card p-8 rounded-[2.5rem] w-full max-w-sm text-center border border-zinc-800 shadow-2xl shadow-blue-500/5">
+            <div class="swiper mySwiper mb-8 rounded-3xl overflow-hidden border border-zinc-800">
                 <div class="swiper-wrapper">
                     <div class="swiper-slide"><img src="https://i.ibb.co/XfqmXyH/1000045022.jpg" class="slider-img"></div>
                     <div class="swiper-slide"><img src="https://i.ibb.co/0YmX4QZ/1000045011.jpg" class="slider-img"></div>
@@ -25,18 +25,18 @@
                 <div class="swiper-pagination"></div>
             </div>
 
-            <h2 id="auth-title" class="text-3xl font-black mb-6 text-blue-500 italic">LOGIN</h2>
+            <h2 id="auth-title" class="text-3xl font-black mb-6 text-blue-500 italic tracking-tighter uppercase">Login</h2>
             
             <div class="space-y-4 text-left">
                 <div id="reg-fields" class="hidden">
-                    <input type="text" id="user-name" placeholder="Full Name" class="auth-input">
+                    <input type="text" id="user-name" placeholder="আপনার নাম" class="auth-input">
                 </div>
                 <input type="email" id="user-email" placeholder="Gmail Address" class="auth-input">
-                <input type="password" id="pin-1" placeholder="Security PIN" class="auth-input">
-                <button onclick="handleAuth()" class="w-full primary-btn p-4 rounded-xl font-black uppercase mt-4">Continue</button>
+                <input type="password" id="pin-1" placeholder="PIN" class="auth-input">
+                <button onclick="handleAuth()" class="w-full primary-btn p-4 rounded-2xl font-black uppercase mt-4 tracking-widest active:scale-95 transition-all">Continue</button>
             </div>
-            <p id="toggle-text" class="mt-6 text-xs text-zinc-500 cursor-pointer" onclick="toggleAuth()">
-                Don't have an account? <span class="text-blue-500 font-bold">Create One</span>
+            <p id="toggle-text" class="mt-8 text-xs text-zinc-500 cursor-pointer" onclick="toggleAuth()">
+                No account? <span class="text-blue-500 font-bold hover:underline">Create Account</span>
             </p>
         </div>
     </section>
@@ -45,9 +45,9 @@
         <header class="p-6 sticky top-0 bg-[#050505]/90 backdrop-blur-xl border-b border-zinc-900 z-50">
             <div class="flex justify-between items-center max-w-5xl mx-auto">
                 <h1 class="text-2xl font-black italic">SIYAM<span class="text-blue-500">BOSS</span></h1>
-                <button onclick="logout()" class="text-red-500 bg-red-500/10 px-4 py-2 rounded-xl text-xs font-bold border border-red-500/20">LOGOUT</button>
+                <button onclick="logout()" class="px-4 py-2 rounded-xl text-red-500 bg-red-500/10 border border-red-500/20 text-[10px] font-bold tracking-widest">LOGOUT</button>
             </div>
-            <nav class="flex justify-center mt-8 gap-8">
+            <nav class="flex justify-center mt-8 gap-10">
                 <button onclick="switchTab('photos')" id="tab-photos" class="nav-tab active">Photos</button>
                 <button onclick="switchTab('videos')" id="tab-videos" class="nav-tab">Videos</button>
                 <button onclick="switchTab('albums')" id="tab-albums" class="nav-tab">Albums</button>
@@ -58,22 +58,23 @@
             <div class="loader-circle"></div>
         </div>
 
-        <div id="photos-content" class="grid grid-cols-3 gap-0.5 max-w-5xl mx-auto pt-0.5"></div>
-        <div id="videos-content" class="hidden grid grid-cols-2 gap-2 p-2 max-w-5xl mx-auto"></div>
-        <div id="albums-content" class="hidden grid grid-cols-2 gap-4 p-4 max-w-5xl mx-auto"></div>
+        <div id="photos-content" class="grid grid-cols-3 gap-0.5 max-w-5xl mx-auto pt-0.5 animate-fade-in"></div>
+        <div id="videos-content" class="hidden grid grid-cols-2 gap-2 p-2 max-w-5xl mx-auto animate-fade-in"></div>
+        <div id="albums-content" class="hidden p-4 grid grid-cols-2 gap-4 max-w-5xl mx-auto animate-fade-in"></div>
 
-        <label for="file-upload" class="fixed bottom-8 right-8 w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center shadow-2xl shadow-blue-500/40 cursor-pointer active:scale-90 transition-all z-[60]">
+        <label for="file-upload" class="fixed bottom-8 right-8 w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center shadow-2xl shadow-blue-600/40 cursor-pointer active:scale-90 transition-all z-[60]">
             <i class="fa-solid fa-cloud-arrow-up text-white text-2xl"></i>
         </label>
         <input type="file" id="file-upload" class="hidden" accept="image/*,video/*" onchange="uploadFile(event)">
     </main>
 
-    <div id="delete-modal" class="hidden fixed inset-0 z-[200] flex items-center justify-center bg-black/90 p-4">
-        <div class="glass-card p-8 rounded-3xl w-full max-w-xs text-center border border-red-500/30">
-            <h3 class="text-xl font-bold mb-4">Delete Item?</h3>
+    <div id="delete-modal" class="hidden fixed inset-0 z-[200] flex items-center justify-center bg-black/95 backdrop-blur-md p-4 animate-fade-in">
+        <div class="glass-card p-8 rounded-3xl w-full max-w-xs text-center border border-red-500/20 shadow-2xl">
+            <i class="fa-solid fa-trash-can text-red-500 text-3xl mb-4"></i>
+            <h3 class="text-xl font-bold mb-8">মুছে ফেলতে চান?</h3>
             <div class="flex gap-4">
-                <button onclick="closeDeleteModal()" class="flex-1 p-3 rounded-xl bg-zinc-800 font-bold">Cancel</button>
-                <button id="confirm-delete-btn" class="flex-1 p-3 rounded-xl bg-red-600 font-bold">Delete</button>
+                <button onclick="closeDeleteModal()" class="flex-1 p-3 rounded-xl bg-zinc-800 font-bold hover:bg-zinc-700 transition-all">Cancel</button>
+                <button id="confirm-delete-btn" class="flex-1 p-3 rounded-xl bg-red-600 font-bold hover:bg-red-500 transition-all">Delete</button>
             </div>
         </div>
     </div>
@@ -81,4 +82,4 @@
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script src="script.js"></script>
 </body>
-</html>
+                    </html>
